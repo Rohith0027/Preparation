@@ -1,0 +1,761 @@
+Rat in a maze
+=============
+
+void solve(int i, int j,vector<vector<int>> &m,int n, vector<string> &ans, vector<vector<int>> &vis, string move,vector<int> &di,vector<int> &dj){
+	if(i==n-1 && j==n-1){
+		ans.push_back(move);
+		return;
+	}
+	string s="DLRU";
+	for(int idx=0;idx<4;idx++){
+		int nexti=i+di[idx];
+		int nextj=j+dj[idx];
+		if(nexti>=0 && nexti<n && nextj>=0 && nextj<n && !vis[nexti][nextj] && m[nexti][nextj]){
+			vis[i][j]=1;
+			solve(nexti,nextj,m,n,ans,vis,move+s[idx],di,dj);
+			vis[i][j]=0;
+		}
+	}
+}
+vector<string> findPath(vector<vector<int>> &m, int n){
+	vector<string> ans;
+	vector<vector<int>>vis(n,vector<int>(n,0));
+	vector<int> di={+1,0,0,-1};
+	vector<int> dj={0,-1,+1,0};
+	if(m[0][0]==1) solve(0,0,m,n,ans,vis,"",di,dj);
+	return ans;
+}
+
+Points to remember:
+->use of back tracking
+->use of recursion
+->cleaning out the steps we made while getting a solution before getting another solution which is called backtracking
+->usage of visited matrix 
+->Remembering of chronological order before preparing an algorithm 
+->checking for boundary conditions 
+->base case for recursion
+
+Combinational sum
+=================
+
+class Solution {
+public:
+    void findCombination(int ind,int target,vector<int>&arr,vector<vector<int>> &ans,vector<int>&ds){
+        if(ind==arr.size()){
+            if(target==0){
+                ans.push_back(ds);
+            }
+            return;
+        }
+        //pick up the element
+        if(arr[ind]<=target){
+            ds.push_back(arr[ind]);
+            findCombination(ind,target-arr[ind],arr,ans,ds);
+            ds.pop_back();
+        }
+        findCombination(ind+1,target,arr,ans,ds);
+    }
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<int>>ans;
+        vector<int> ds;
+        findCombination(0,target,candidates,ans,ds);
+        return ans;
+    }
+};
+
+Points to remember:
+->use of backtracking
+->use of recursion
+->using data structure stack
+->removing added elements into data structure while back tracking for new solution
+->this algorithm is based on method called pick or not pick method 
+
+Crossword Puzzle
+================
+
+#include<iostream>
+using namespace std;
+char crossWord[10][10];
+ 
+bool isValidHorizontal(int row, int col, string word){
+	if(10 - col < word.length())
+		return false;
+	for (int i = 0, j = col; i < word.length(); ++i,j++)
+	{
+		if (crossWord[row][j] != '-' && crossWord[row][j] != word[i]){
+			return false;
+		}
+	}
+	return true;
+}
+bool isValidVertical(int row, int col, string word){
+	if(10 - row < word.length())
+		return false;
+	for (int i = row, j = 0; j < word.length(); ++i,j++)
+	{
+		if (crossWord[i][col] != '-' && crossWord[i][col] != word[j]){
+			return false;
+		}
+	}
+	return true;
+}
+void setHorizontal(int row, int col, string word, bool state[]){
+	for (int i = 0, j = col; i < word.size(); ++i, j++)
+	{
+		if (crossWord[row][j] != '+'){
+			if(crossWord[row][j] == word[i])
+				state[i] = false;
+			else
+				state[i] = true;
+			crossWord[row][j] = word[i];
+		}
+	}
+}
+void setVertical(int row, int col, string word, bool state[]){
+	for (int i = 0, j = row; i < word.size(); ++i, j++)
+	{
+		if (crossWord[j][col] != '+'){
+			if(crossWord[j][col] == word[i])
+				state[i] = false;
+			else
+				state[i] = true;
+			crossWord[j][col] = word[i];
+		}
+	}
+}
+void resetHorizontal(int row, int col, bool state[], int size){
+	for (int i = 0, j = col; i < size; ++i,j++)
+	{
+		if(state[i] == true)
+			crossWord[row][j] = '-';
+	}
+	return;
+}
+void resetVertical(int row, int col, bool state[], int size){
+	for (int i = 0, j = row; i < size; ++i,j++)
+	{
+		if(state[i] == true)
+			crossWord[j][col] = '-';
+	}
+	return;
+}
+ 
+void set_value(bool helper[],int len ){
+	for(int i=0;i<len;i++){
+		helper[i] = false;
+	}
+}
+bool crossWordHelper(string input[], int size, int index){
+	if(index == size){
+		for(int i =0; i<10; i++){
+			for(int j=0; j<10; j++){
+				cout << crossWord[i][j] ;
+			}
+			cout << endl;
+		}
+		return true;
+	}
+	for(int i =0; i<10; i++){
+		for(int j=0; j<10; j++){
+			if(crossWord[i][j] == '-' || crossWord[i][j] == input[index][0]){
+				int length = input[index].size();
+				bool state[length];
+				set_value(state,length);
+				if(isValidHorizontal(i, j, input[index])){
+					setHorizontal(i, j, input[index], state);
+					if(crossWordHelper(input, size, index+1)){
+						return true;
+					}
+					resetHorizontal(i, j, state, length);
+				}
+ 
+				if(isValidVertical(i, j, input[index])){
+					setVertical(i, j, input[index], state);
+					if(crossWordHelper(input, size, index+1)){
+						return true;
+					}
+					resetVertical(i, j, state, length);
+				}
+			}
+		}
+	}
+	return false;
+}
+void solveCrossWord(string input[], int size){
+	bool res = crossWordHelper(input, size, 0);
+	return;
+}
+int main(){
+	string ss;
+	for(int i = 0; i<10; i++){
+		cin >>ss;
+		for(int j = 0; j < ss.size(); j++){
+			crossWord[i][j] =  ss[j];
+		}
+	}
+	char s[200];
+	cin >> s;
+	string input[10];
+	char ch;
+	string word ="";
+	int a =0;
+	for (int i = 0; s[i] != '\0'; ++i)
+	{
+		if(s[i] == ';'){
+			input[a++] = word;
+			word ="";
+		}
+		else {
+			word += s[i];
+		}
+	}
+	input[a++] = word;
+	solveCrossWord(input, a);
+return 0;
+}
+
+(or)
+
+Approach 2:
+->this method is based on tasks
+->creating a task like 
+	-> At a particular index should we fit the word vertically or horizontally
+		ex- task 1 - at 1,1(horizontally)
+					 2,2(vertically)
+->these tasks will be created in a list format in c++
+->by calling recursively the function we declare which fits at a particular place
+->in between we need to take care of some specific conditions like 
+	->before a fitting a word there should be letter of it well before 
+	->boundary conditions
+	->base case
+->add removed task again while back tracking
+
+Longest Possible Route in a Matrix with Hurdles
+================================================
+
+class Solution{
+public:
+    void calcPath(vector<vector<int>> matrix, int xs,int ys,int xd,int yd,int currlen,int &length){
+        if(xs==xd && ys==yd){
+            if(currlen>length){
+                length=currlen;
+                return;
+            }
+        }
+        vector<pair<int,int>> direction = {{0,1},{0,-1},{1,0},{-1,0}};
+        matrix[xs][ys]=2;
+        for(auto i:direction){
+            int newx=xs+i.first;
+            int newy=ys+i.second;
+            if(newx>=0 && newt>=0 && newx=matrix.size() && newy<matrix[0].size() && matrix[newx][newy]==1){
+                calcPath(matrix,newx,newy,xd,yd,currlen+1,length);
+            }
+        }
+        matrix[xs][ys]=1;
+    }
+    int longestPath(vector<vector<int>> matrix, int xs,int ys,int xd,int yd){
+        if(matrix[xs][ys]==0 || matrix[xd][yd]==0) return -1;
+        int length=-1;
+        calcPath(matrix,xs,ys,xd,yd,0,length);
+        return length;
+    }
+
+Points to remember:
+->use of backtracking
+->use of recursion
+->same as rat in a maze problem but here using of currlen variable to store maximum length to reach destination
+->base and boundary conditions
+->removing the added elements while back tracking
+
+N-Queens Problem
+=================
+
+class Solution {
+bool isSafe(int row,int col,vector<string>board,int n){
+    //check upper element
+    int duprow = row;
+    int dupcol = col;
+    while(row >= 0 && col >=0){
+        if(board[row][col] == 'Q') return false;
+        row--;
+        col--;
+    }
+    col = dupcol;
+    row = duprow;
+    while(col>=0){
+        if(board[row][col]=='Q') return false;
+        col--;
+    }
+    row=duprow;
+    col=dupcol;
+    while(row<n && col>=0){
+        if(board[row][col]=='Q') return false;
+        row++;
+        col--;
+    }
+    return true;
+}
+public:
+    void solve(int col,vector<string> &board,vector<vector<string>> &ans,int n){
+        if(col == n){
+            ans.push_back(board);
+            return;
+        }
+        for(int row=0;row<n;row++){
+            if(isSafe(row,col,board,n)){
+                board[row][col]='Q';
+                solve(col+1,board,ans,n);
+                board[row][col]='.';
+            }
+        }
+    }
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string>> ans;
+        vector<string> board(n);
+        string s(n,'.');
+        for(int i=0;i<n;i++){
+            board[i]=s;
+        }
+        solve(0,board,ans,n);
+        return ans;
+    }
+};
+
+(or)
+
+2nd approach:
+->using hashing for upper diagonal and lower diagonal while checking for queen
+
+class Solution {
+public:
+    void solve(int col,vector<string> &board,vector<vector<string>> &ans,vector<int> &leftRow,vector<int> &upperDiagonal, vector<int> &lowerDiagonal, int n){
+        if(col == n){
+            ans.push_back(board);
+            return;
+        }
+        for(int row=0;row<n;row++){
+            if(leftRow[row]==0 && lowerDiagonal[row+col]==0 && upperDiagonal[n-1 + col - row]==0){
+                board[row][col]='Q';
+                leftRow[row]=1;
+                lowerDiagonal[row+col]=1;
+                upperDiagonal[n-1+col-row]=1;
+                solve(col+1,board,ans,leftRow,upperDiagonal,lowerDiagonal,n);
+                board[row][col]='.';
+                leftRow[row]=0;
+                lowerDiagonal[row+col]=0;
+                upperDiagonal[n-1+col-row]=0;
+            }
+        }
+    }
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string>> ans;
+        vector<string> board(n);
+        string s(n,'.');
+        for(int i=0;i<n;i++){
+            board[i]=s;
+        }
+        vector<int> leftRow(n,0),upperDiagonal(2*n-1,0),lowerDiagonal(2*n-1,0);        
+        solve(0,board,ans,leftRow,upperDiagonal,lowerDiagonal,n);
+        return ans;
+    }
+};
+
+Points to remember:
+->backtracking
+->recursion
+->hashing values at diagonals and row for the sake of checking safety
+->for lower diagonal use row + col and upper diagonal use (n-1) + (col-row)
+
+M-Coloring Problem
+===================
+
+bool isSafe(int node, int color[],bool graph[101][101],int n,int col){
+	for(int k=0;k<n;k++){
+		if(k!=node && graph[k][node]==1 && color[k]==col){
+			return false;
+		}
+	}
+	return true;
+}
+bool solve(int node,int color[],int m,int N,bool graph[101][101]){
+	if(node==N){
+		return true;
+	}
+	for(int i=1;i<=m;i++){
+		if(isSafe(node,color,graph,N,i)){
+			color[node]=i;
+			if(solve(node+1,color,m,N,graph)) return true;
+			color[node]=0;
+		}
+	}
+	return false;
+}
+bool graphColoring(bool graph[101][101],int m,int N){
+	int color[N]={0};
+	if(solve(0,color,m,N,graph)) return true;
+	return false;
+}
+
+The Knights Problem
+====================
+
+Vector<vector<int>> mat(vector<int>(n,0));
+Vector<vector<bool>> visited(n,vector<bool>(false));
+solve(n,0,0,0,mat,visited);
+
+Void solve(int n, int i,int joint int, vector<vector<int>>&mat,vector<vector<bool>>&visited){
+	if(I<0||j<0||I>=n||j>=n)
+		return;
+	if(visited[I][j])
+		return;
+	if(cnt==(n*n-1){
+		mat[I][j]=cnt;
+		return;
+		}
+	visited[I][j]=true;
+	mat[I][j]=cnt;
+solve(n,i-2,j+1,cnt+1,mat,visited);
+solve(n,i-2,j-1,cnt+1,mat,visited);
+solve(n,i+2,j+1,cnt+1,mat,visited);
+solve(n,i+2,j-1,cnt+1,mat,visited);
+solve(n,i-1,j+2,cnt+1,mat,visited);
+solve(n,i-1,j-2,cnt+1,mat,visited);
+solve(n,i+1,j+2,cnt+1,mat,visited);
+solve(n,i+1,j-2,cnt+1,mat,visited);
+visited[I][j]=false;
+mat[I][j]=0;
+Return;
+
+Points to remember:
+->backtracking
+->recursion
+->dfs
+
+
+Remove Invalid Parentheses
+===========================
+
+class Solution {
+public:
+void solve(string s,vector<string>&ans,unordered_map<string,bool>&mp,int removals){
+	if(mp[s])
+		return;
+	mp[s]=true;
+	if(removals==0){
+		int removals_needed=find_removals(s);
+		if(removals_needed==0)
+			ans.push_back(s);
+		return;
+	}
+	for(int i=0;i<s.length();++i){
+		string leftpart=s.substr(0,i);
+		string rightpart=s.substr(i+1);
+		string join=leftpart+rightpart;
+		solve(join,ans,mp,removals-1);
+	}
+	return;
+}
+int find_removals(string s){
+	stack<char>st;
+	for(int i=0;i<s.length();++i){
+		if(s[i]=='('){
+			st.push(s[i]);
+		}
+		else if(s[i]==')'){
+			if(st.size()!=0 && st.top()=='('){
+				st.pop();
+			}else{
+				st.push(')');
+			}
+		}
+	}
+	return st.size();
+}
+    vector<string> removeInvalidParentheses(string s) {
+        unordered_map<string,bool>mp;
+        int min_removals=find_removals(s);
+        vector<string>ans;
+        solve(s,ans,mp,min_removals);
+        return ans;
+    }
+};
+
+Points to remember:
+->backtracking
+->recursion
+->using of map
+
+
+Word breaking
+=============
+
+unordered_set<string> s;
+void solve(string str,int len,string res){
+	for(int i=1;i<=len;i++){
+		string pre=str.substr(0,i);
+		if(s.find(pre)!=s.end()){
+			if(i==len){
+				res+=pre;
+				cout<<res<<endl;
+			}
+			go(str.substr(i,len-i),len-i,res+pe+" ");
+		}
+	}
+}
+
+Point to remember:
+->backtracking 
+->recursion
+->unordered map
+
+Palindrome Partitioning 
+========================
+
+class Solution {
+public:
+    vector<vector<string>> partition(string s) {
+        vector<vector<string>> res;
+        vector<string> path;
+        func(0,s,path,res);
+        return res;
+    }
+    void func(int index,string s, vector<string>&path, vector<vector<string>>&res){
+        if(index==s.size()){
+            res.push_back(path);
+            return;
+        }
+        for(int i=index;i<s.size();i++){
+            if(isPalindrome(s,index,i)){
+                path.push_back(s.substr(index,i-index+1));
+                func(i+1,s,path,res);
+                path.pop_back();
+            }
+        }
+    }
+    bool isPalindrome(string s,int start,int end)
+{
+    while(start<=end){
+        if(s[start++]!=s[end--])
+            return false;
+    }
+    return true;
+}};
+
+Points to remember:
+->backtracking
+->recursion
+->creating path vector to store current palindrome from the process
+
+
+Find Shortest Safe route in a path with landmines
+=================================================
+
+#include<bits/stdc++.h>
+using namespace std;
+int solve(int row,int col,set<pair<int,int>>&st,vector<vector<bool>> visited,int i,int j,int cnt)
+{
+    if(i==row || i<0 || j<0 || j==col || st.count({i,j}) || visited[i][j])
+        return INT_MAX;
+    if(j==col-1)
+        return cnt;
+    visited[i][j]=true;    
+    int l1=solve(row,col,st,visited,i+1,j,cnt+1);
+    int l2=solve(row,col,st,visited,i-1,j,cnt+1);
+    int l3=solve(row,col,st,visited,i,j+1,cnt+1);
+    int l4=solve(row,col,st,visited,i,j-1,cnt+1);
+    visited[i][j]=false;
+    return min({l1,l2,l3,l4});
+}
+int main()
+{
+   int row,col;
+   cin>>row>>col;
+   vector<vector<int>> mat(row,vector<int>(col));
+   vector<vector<bool>> visited(row,vector<bool>(col,false));
+   for(int i=0;i<row;++i)
+   {
+       for(int j=0;j<col;++j)
+       {
+           cin>>mat[i][j];
+       }
+   }
+   set<pair<int,int>> st;
+   for(int i=0;i<row;++i)
+   {
+       for(int j=0;j<col;++j)
+       {
+           if(mat[i][j]==0)
+           {
+               pair<int,int> p{i,j};
+               st.insert(p);
+ 
+                if(i+1<row)
+                {
+                    pair<int,int> p{i+1,j};
+                    st.insert(p);
+                }
+ 
+                if(i-1>=0)
+                {
+                    pair<int,int> p{i-1,j};
+                    st.insert(p);
+                }
+                if(j+1<col)
+                {
+                    pair<int,int> p{i,j+1};
+                    st.insert(p);
+                }
+                if(j-1>=0)
+                {
+                    pair<int,int> p{i,j-1};
+                    st.insert(p);
+                }
+           }
+       }
+   }
+   int ans=INT_MAX;
+   for(int i=0;i<row;++i)
+   {
+       if(st.count({i,0})==0){
+           int length=solve(row,col,st,visited,i,0,0);
+           cout<<i<<" "<<length<<endl;
+           ans=min(ans,length);
+       }
+   }
+ 
+   cout<<ans;
+   return 0;
+}
+
+Points to remember:
+->backtracking
+->recursion
+->visited matrix
+->set of pair for landmines and boundary cases
+
+Partition of a set into K subsets with equal sum
+================================================
+
+class Solution {
+public:
+    void solve(vector<int>nums,int n,int k,int currsum,int count,vector<int>&visited,int sum,int ans){
+        if(count==k-1){
+            ans=true;
+            return;
+        }
+        if(currsum>sum){
+            return;
+        }
+        if(currsum==sum){
+            return solve(nums,n,k,0,count+1,visited,sum,ans);
+            if(ans==true)
+                return;
+        }
+        for(int i=0;i<n;++i){
+            if(visited[i]==false){
+                visited[i]=true;
+                solve(nums,n,k,currsum+nums[i],count,visited,sum,ans);
+                if(ans==true){
+                    return;
+                }
+                visited[i]=false;
+            }
+        }
+        return;
+    }
+    bool canPartitionKSubsets(vector<int>& nums, int k) {
+        int n=nums.size();
+        if(k>nums.size()){
+            return false;
+        }
+        if(k==1){
+            return true;
+        }
+        int sum = 0;
+        for(int i=0;i<n;++i){
+            sum+=nums[i];
+        }
+        if(sum%k!=0){
+            return false;
+        }
+        vector<int>visited(n,false);
+        bool ans=false;
+        solve(nums,n,k,0,0,visited,sum/k,ans);
+        return ans;
+    }
+};
+
+Points to remember:
+->backtracking 
+->recursion
+->visited matrix
+->counting until k-1
+
+
+Tug Of War
+==========
+
+void tugofwar(int arr[],int n,int i,int sum1,int sum2,vector<int>arr1,vector<int>arr2,int diff,int res[]){
+    if(i==n){
+        if(arr1.size()==(n+1)/2){
+            if(abs(sum1-sum2)<diff){
+                diff=abs(sum1-sum2);
+                for(int i=0;i<n;i++)
+                    res[i]=false;
+                    for(int i=0;i<arr1.size();i++)
+                        res[arr1[i]]=true;
+            }
+        }
+        return;
+    }
+    arr1.push_back(i);
+    tugofwar(arr,n,i+1,sum1+arr[i],sum2,arr1,arr2,diff,res);
+    arr1.pop_back();
+    arr2.push_back(i);
+    tugofwar(arr,n,i+1,sum1,sum2+arr[i],arr1,arr2,diff,res);
+    arr2.pop_back();
+}
+
+->backtracking
+->recursion
+->checking set1 size should be n+1/2
+->piping back the inserted combination in the array for backtracking
+
+
+(Or)
+
+It can be done through bit masking . We can find the combinations using bit manipulation and by doing so we can find the combinations 
+
+
+Find Maximum number possible by doing at-most K swaps
+=====================================================
+
+void solve(string str,int n,int k,string& ans,int index){
+    if(k==0)
+        return;
+    char maxchar=str[index];
+    for(int i=index+1;i<n;i++){
+        if(maxchar<str[i])
+            maxchar=str[i];
+    }
+    if(maxchar!=str[index])
+        k--;
+    for(int i=n-1;i>=index;i--){
+        if(str[i]==maxchar){
+            swap(str[index],str[i]);
+            if(ans<str)
+                ans=str;
+            solve(str,n,k,ans,index+1);
+            swap(str[index],str[i]);//backtracking step
+        }
+    }
+}
+
+Points to remember:
+->backtracking
+->recursion
+->checking from right of the string for greater character
+->swapping it until given number of times
