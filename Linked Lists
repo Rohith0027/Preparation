@@ -1,0 +1,670 @@
+Reverse Linked List
+=======================
+
+Iterative method:-
+class Solution {
+public:
+    Node* reverseList(ListNode* head) {
+       	Node* prevptr=NULL;
+        Node* currptr=head;
+        Node* nextptr;
+        while(currptr!=NULL){
+            nextptr=currptr->next;
+            currptr->next=prevptr;
+            prevptr=currptr;
+            currptr=nextptr;
+        }
+        return prevptr;
+    }
+};
+
+Recursive Method:-
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        if(head==NULL || head->next==NULL){
+            return head;
+        }
+
+        ListNode* newhead=reverseList(head->next);
+        head->next->next=head;
+        head->next=NULL;
+        return newhead;
+    }
+};
+
+Linked List Cycle
+====================
+
+1st brute force approach:-
+Using hash table
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+2nd Approach:-(Floyd’s Cycle detection)
+Using a slow pointer and fast pointer
+->the slow pointer will move one step ahead but the fast pointer will move 2 steps ahead
+->if there is a cycle then fast and slow pointers will meet a point
+->if fast pointer reaches null then it doesn’t have a cycle
+Time Complexity-O(n)
+Space Complexity-O(1)
+
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+       if(head==NULL || head->next==NULL){
+           return false;
+       } 
+        ListNode *slow=head;
+        ListNode *fast=head;
+       while(fast->next && fast->next->next){
+           fast=fast->next->next;
+           slow=slow->next;
+           if(fast==slow){
+               return true;
+           }
+       }
+       return false;
+   }
+};
+
+3rd Approach:-
+->create a map where it stores true after visiting the node 
+->if a loop is present then the function will show it has a loop because the fetching node is already marked as true which means it has a loop.
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+bool detectloop(Node* head){
+	if(head==NULL){
+		return false;
+	}
+	map<Node* , bool> visited;
+	Node* temp=head;
+	while(temp!=NULL){
+		if(visited[temp]==true){
+			return true;
+		}
+		visited[temp]=true;
+		temp=temp->next;
+	}
+	return false;
+}
+
+Merge two different linked lists which are sorted
+========================================================
+
+Approach 1:-
+->create dummy node and one head1 for one linked list and one head 2 for another linked list
+->While traversing head1 and head2 in the linked lists compare which is smaller
+->if it is smaller then create a duplicate dummy node and add it to that node
+->like wise create all duplicate dummy nodes and the head will be next of dummy node which is created at first
+Time complexity-O(n1+n2)
+Space Complexity-O(n1+n2)
+
+Approach 2:-
+ ->create two variables that are l1 and l2
+->l1 is pointing to 1st linked list and l2 to the second
+->now create a result and a temp node
+->while traversing the l1 linked list , check weather node pointed by the l1 is less than l2 .
+->if it is then simple add that l1 to temp and point result to that l1 node
+->if not then simple swap l1 and l2 . Here we need to make sure that temp is now new l1 as it is swapped
+->at last , copy pasting the last node in the second linked list or first linked list into the result 
+Time Complexity-O(n1+n2)
+Space Complexity-O(1)
+
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        if(l1==NULL) return l2;
+        if(l2==NULL) return l1;
+        if(l1->val > l2->val) std::swap(l1,l2);
+        ListNode *res=l1;
+        while(l1!=NULL && l2!=NULL){
+            ListNode * tmp = NULL;
+            while(l1!=NULL && l1->val <= l2->val){
+                tmp=l1;
+                l1=l1->next;
+            }
+            tmp->next=l2;
+            std::swap(l1,l2);
+        }
+        return res;
+    }
+};
+
+Deleting a node
+==================
+
+Simply coping the next node data into the given deleting node and making next of given node to next->next
+class Solution {
+public:
+    void deleteNode(ListNode* node) {
+        node->val=node->next->val;
+        node->next=node->next->next;
+    }
+};
+Time Complexity-O(1)
+
+
+Delete duplicates from sorted linked list
+==============================================
+
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if(head==NULL){
+            return NULL;
+        }
+        ListNode* curr=head;
+        while(curr != NULL){
+            if( (curr->next!=NULL) && curr->val == curr->next->val ){
+                ListNode* next_next=curr->next->next;
+                ListNode* delete_node=curr->next;
+                delete(delete_node);
+                curr->next=next_next;
+            }
+            else{
+                curr=curr->next;
+            }
+        }
+        return head;
+    }
+};
+Time Complexity-O(n)
+Space Complexity-O(1)
+
+
+Delete duplicates from unsorted linked list
+=================================================
+
+Approach 1:
+->using a for loop and checking every node with other node , does it exit or not.
+->if exist delete the node else move the pointer to next node
+Time Complexity-O(n2)
+Space Complexity-O(1)
+
+Approach 2:
+->First sort the linked list and do the same also that was done in “remove duplicates from the sorted linked list”
+Time Complexity-for sorting O(nlogn) and for O(n) for also
+Space Complexity-O(1)
+
+Approach 2:
+->it is by using map concept
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+
+Sort Linked List of having 1’s,2’s and 0’s
+==============================================
+
+->Increase count for every 1 and respectively increase other respective counts for other two numbers
+->now again traverse the linked list but now according to counts of different numbers allocate them in new linked list by decreasing the respective counts
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+Multiply two lists
+====================
+
+->there will be two lists given 
+->need to form a number from lists I.e from left to right for both the lists
+->multiply numbers formed 
+->need to use mod ignorer to neglect overflow
+long long  multiplyTwoLists (Node* l1, Node* l2)
+{
+  //Your code here
+  Node *p1,*p2;
+  p1=l1;
+  p2=l2;
+  long long int mod=1000000007;
+  long long int num1=0,num2=0;
+  while(p1!=NULL){
+      num1=(num1*10+(p1->data))%mod;
+      p1=p1->next;
+  }
+  while(p2!=NULL){
+      num2=(num2*10+(p2->data))%mod;
+      p2=p2->next;
+  }
+    return (num1*num2)%mod;
+}
+
+Remove nth node from the linked list from the end
+==========================================================
+
+Approach 1:
+->First create a dummy node and traverse the list for the size of the list
+->once the size of the list is known then subtract the given n from the size of the node.
+->Now again the traverse the linked list and delete the resultant atter subtracting from the size.
+->but there is an edge case where the deletion of node takes place at first node , to solve this we need to point node=head,head=head->next,delete(node).
+Time Complexity-O(2n)
+Space Complexity-O(1)
+
+Approach 2:
+->Make a fast pointer and slow pointer.
+->and a new node that is start and point it to head(I.e start->next=head)
+->Now forward fast pointer upto n times forward
+->Now take an another loop and forward slow pointer by one step and fast pointer respectively until it becomes (fast->next==NULL)
+->once it is done make slow pointer to next next from slow->next.
+->return the start->next.
+Time Complexity-O(n)
+Space Complexity-O(1)
+
+
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        ListNode* start=new ListNode();
+        start->next=head;
+        ListNode* fast=start;
+        ListNode* slow=start;
+        for(int i=1;i<=n;i++){
+            fast=fast->next;
+        }    
+        while(fast->next!=NULL){
+            fast=fast->next;
+            slow=slow->next;
+        }
+        slow->next=slow->next->next;
+        return start->next;
+    }
+};
+
+Reorder List
+===============
+
+->First find the middle node from the linked list
+->It will be done by making a two pointer they are fast and slow .
+->the fast pointer will move two steps ahead and slow pointer move one step ahead 
+->once the fast pointer reaches NULL break the loop and the position of slow pointer will be middle element
+->After getting middle element reverse the list from the middle element and make a second linked list.
+->Now merge the linked listed as mentioned in the problem
+
+
+class Solution {
+public:
+    ListNode* reverse(ListNode* head){
+        ListNode* prev=NULL;
+        ListNode* curr=head;
+        ListNode* nxt=NULL;
+        while(curr){
+            nxt=curr->next;
+            curr->next=prev;
+            prev=curr;
+            curr=nxt;
+        }
+        return prev;
+    }
+    void reorderList(ListNode* head) {
+        ListNode* slow=head;
+        ListNode* fast=head->next;
+        while(fast and fast->next){
+            slow=slow->next;
+            fast=fast->next->next;
+        }
+\\reversing of linked list
+        ListNode* second=reverse(slow->next);
+        slow->next=NULL;
+        ListNode* first=head;
+
+\\merging of linked lists
+        while(second){
+            ListNode* temp1=first->next;
+            ListNode* temp2=second->next;
+            first->next=second;
+            second->next=temp1;
+            first=temp1;
+            second=temp2;
+        }
+    }
+};
+
+Remove loop in Linked List
+=============================
+
+->use Floyd’s algorithm to search for the loop existence or not
+->once confirmed again use slow and fast pointers traverse through the linked list
+->but now the slow will again start from the head of the linked list but the fast will again move forward from the intersection point while we traversed in linked list for finding the loop
+->once the slow and fast meet at a node then it is the starting node of the loop
+Time Complexity-O(n)
+Space Complexity-O(1)
+
+\\detectloop(Floyd’s)
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+       if(head==NULL || head->next==NULL){
+           return false;
+       } 
+        ListNode *slow=head;
+        ListNode *fast=head;
+       while(fast->next && fast->next->next){
+           fast=fast->next->next;
+           slow=slow->next;
+           if(fast==slow){
+               return true;
+           }
+       }
+       return false;
+   }
+};
+
+\\get starting node of the loop of the linked list
+bool getstartingnode(Node* head){
+	if(head==NULL){
+		return NULL;
+	}
+	Node* intersection = hasCycle(head);
+	Node* slow=head;
+	while(slow!=intersection){
+		slow=slow->next;
+		intersection=intersection->next;
+	}
+	
+	return slow;
+}
+
+\\removing of loop
+void removeLoop(Node* head)
+    {
+        if(head==NULL)
+            return;
+        Node* startodloop=getstartingnode(head);
+        Node* temp=startofloop;
+        while(temp->next != startofloop){
+            temp=temp->next;
+        }
+        temp->next=NULL;
+    }
+
+Write a function to get the intersection point of two Linked Lists
+=====================================================================
+
+Approach 1:
+->Traverse the longer linked list.
+->For every node in longer linked list compare every node in smaller linked list by traversing smaller linked list
+Time Complexity-O(n*m)
+Space Complexity-O(1)
+
+Approach 2:
+->Using a hash table
+->For every node in smaller linked list create a hash value for the address of the node.
+->Now traverse the longer linked list and check the hash values , if the hash values become equal then it is the answer.
+Time Complexity-O(n+m)
+Space Complexity-O(n)
+
+Approach 3:
+->Use two dummy nodes .
+->d1 for smaller linked list and d2 for longer linked list
+->traverse both the linked lists and get the lengths of each linked lists .Let them be n1 and n2
+->Now get the difference between both the lengths.let it be d=n1-n2
+->Now move d2 ahead upto the value of difference.
+->Once it is done now move both d1 and d2 simulataneously one step ahead 
+->both d1 and d2 meet at a node it is the answer.
+->if they don’t meet then both the linked lists has no linked node 
+Time Complexity-O(2m)
+Space Complexity-O(1)
+
+Approach 4:
+->use two dummy nodes d1 and d2
+->Now move both the dummy node simultaneously one step a head until any one of the d1 or d2 reaches null
+->”If d1 reaches the null then assign d1->next to head of second linked list” (or) “if d2 reaches the null then assign d2->next to the head of the first linked list”
+->Once the assigning is done again traverse them one step ahead through the linked lists.
+->Do this process again and again until they meet at a node or null
+->if they meet at a common node then it is the answer but if they meet at null then it does not have a common node
+Time Complexity-O(2m)
+Space Complexity-O(1)
+
+int intersectPoint(Node* head1, Node* head2)
+{
+    // Your Code Here
+    if(head1==NULL || head2==NULL) return NULL;
+    Node* a=head1;
+    Node* b=head2;
+    while(a!=b){
+        a=a==NULL? head2 : a->next;
+        b=b==NULL? head1 : b->next;
+    }
+    return a->data;
+}
+
+Linked List in Zig-Zag Fashion
+===================================
+void zigZagList(Node* head){
+	bool flag=true;
+	Node* current=head;
+	while(current->next != NULL){
+		if(flag)/*"<" relation expected */{
+			/* If we have a situation like A>B>C where A,B and C are consecutive
+			Nodes in list we get A>B<C By swapping B and C */
+			if(current->data > current->next->data)
+				swap(current->data, current->next->data);
+		}
+		else /* ">" relation expected */{
+			/*If we have a situation like A<B<C where A,B and C are consecutive
+			Nodes in list we get A<C>B by swapping B and C */
+			if(current->data < current->next->data)
+				swap(current->data,current->next->data);
+		}
+		current=current->next;
+		flag=!flag;/* flip flag for reverse checking*/
+	}
+}
+
+Reverse Doubly Linked List
+=============================
+
+Node* reverseDLL(Node* head){
+	Node* cur=head;
+	if(cur==NULL or cur->next==NULL)
+		return head;
+	while(curr->next!=NULL)
+		cur=cur->next;
+	head=cur;
+	cur->next=cur->prev;
+	cur->prev=NULL;
+	cur=cur->next;
+	while(cur->prev!=NULL){
+		Node* temp=cur->next;
+		cur->next=cur->prev;
+		cur->prev=temp;
+		cur=cur->next;
+	}
+	cur->prev=cur->next;
+	cur->next=NULL;
+	return head;
+}
+
+Delete nodes which have a greater value on right side
+==========================================================
+
+Approach 1:
+->use two loops and traverse all the nodes from starting to ending again and again 
+->if greater node is found then delete the current node 
+Time Complexity-O(n^2)
+Space Complexity-O(1)
+
+Approach 2:
+->start traversing from back of the linked list after reversing the given linked list
+->Use a max pointer variable
+->update max when ever a greater node is found
+->Compare the traversing node with the max while traversing
+->after the total itreation is done the remaining nodes are the answer 
+->once again reverse the resultant array which will be the answer
+Time Complexity-O(n)
+Space Complexity-O(1)
+
+class Solution
+{
+	public:
+	Node* reverse(NOde* root){
+		Node* prev=NULL;
+		Node* cur=root;
+		while(cur){
+			Node* next=cur->next;
+			cur->next=prev;
+			prev=cur;
+			cur=next;
+		}
+		return prev;
+	}
+	Node* compute(Node *head){
+		head=reverse(head);
+		Node* cur=head;
+		int ma=head->data;
+		Node* prev=head;
+		head=head->next;
+		while(head){
+			if(head->data>=ma){
+				ma=head->data;
+				prev=head;
+				head=head->next;
+			}else{
+				prev->next=head->next;
+				prev=prev->next;
+			}
+		}
+		head=reverse(cur);
+		return head;
+	}
+}
+
+Segregate even and odd nodes in a Linked List
+==================================================
+
+->Use even, odd,o,e.
+->where while traversing if the node is odd update odd=node->data (or) if the node is even update even=node->data.
+->once it is done make the o pointer to point at odd node from the linked list (or) e pointer to point at even node from the linked list
+->traverse the linked list until NULL and update all the node in novelist of o and e
+->now put e at first and o after 
+->point o->next to the even and e->next to NULL and here the head will be odd
+Time Complexity-O(n)
+class Solution
+{
+	public:
+	Node* divide(int N,Node* head){
+		Node* even=NULL;
+		Node* odd=NULL;
+		Node* e=NULL;
+		Node* o=NULL;
+		while(head){
+			if(head->data%2==0){
+				if(even==NULL){
+					even=head;
+					e=head;
+				}else{
+					e->next=head;
+					e=e->next;
+				}
+			}else{
+				if(odd==NULL){
+					odd=head;
+					o=head;
+				}else{
+					o->next=head;
+					o=o->next;
+				}
+			}
+			head=head->next;
+		}
+		if(e) e->next=odd;
+		if(o) o->next=NULL;
+		if(even) return even;
+		return odd;
+	}
+
+};
+
+Point to next higher value node in a linked list with an arbitrary pointer
+============================================================================
+
+https://www.geeksforgeeks.org/point-to-next-higher-value-node-in-a-linked-list-with-an-arbitrary-pointer/
+Time Complexity-O(nlongn)
+->Traverse input list and copy next pointer to arbit pointer for every node. 
+->Do Merge Sort for the linked list formed by arbit pointers.
+
+
+Merge K sorted linked lists
+=============================
+
+Approach 1:
+->Count number of node present in all the given k linked lists
+->Now sort all the nodes from the k linked lists
+Time Complexity-O(nlogn)
+->it is a brute force approach for this problem
+
+Approach 2:
+->if they are k sorted linked lists are given then, every time merge (k-1) and (k-2) and form store it in any one of the sorted linked lists 
+->next merge the resultant with the kth linked list 
+->do it again and again until merging of two two linked lists reaches upto kth linked list
+Time Complexity-O(n*k)
+Space Complexity-O(1)
+
+Approach 3:
+->using of priority queue
+->take first elements from the sorted linked lists given and store them into a priority queue
+->Now traverse the linked lists and if there is a greater element from the top of the queue then simply pop the element from the priority queue and store it into the answer linked list
+->similarly traverse all the linked lists and by using priority queue get the resultant in a sorted linked list
+Time Complexity-O(nlogk)
+Space Complexity-O(logk) 
+
+Approach 4:
+->Now by merging lists from starting and ending
+->Merge the starting list and ending list and store it in starting list 
+->now do this process until all lists are merged 
+Time Complexity-O(unlock)
+Space Complexity-O(1)
+
+class Solution {
+public:
+    ListNode* sM(ListNode* a,ListNode* b){
+        ListNode* result=NULL;
+        if(a==NULL) return (b);
+        else if(b==NULL) return (a);
+        if(a->val<=b->val){
+            result=a;
+            result->next=sM(a,b->next);
+        }else{
+            result=b;
+            result->next=sM(a,b->next);
+        }
+        return result;
+    }
+    ListNode* mergeKLists(ListNode* arr[],int k) {
+        int i=0;
+        int last=k-1;
+        int j;
+        while(last!=0){
+            i=0;
+            j=last;
+            while(i<j){
+                lists[i]=sM(lists[i],lists[j]);
+                i++;
+                j--;
+                if(i>=j){
+                    last=j;
+                }
+            }
+        }
+        return lists[0];
+    }
+};
+
+
+Merge Sort for Linked list
+============================
+
+https://www.youtube.com/watch?v=EXPY4SNCbhQ
+
+Quick Sort
+============
+->Making a pivot node and arranging the nodes in a sorted order
+->Here the pivot node will be the last node 
+->by traversing in the linked list 
+	if the node data is less than pivot node data then it will fall under left side of the pivot node 
+	if the node data is more than pivot node data then it will fall under tight side of pivot node 
+->now the left side of pivot will be unsorted list but these are less than the pivot element
+->now the right side of the pivot willl be unsorted list but thees are more than the pivot element
+->repeat this for the other elements again and again until the total list is sorted and pivot reaches head of the linked list
+->This approach is based on divide and conquer method
+
+https://www.youtube.com/watch?v=QkuFEMSbY-0
