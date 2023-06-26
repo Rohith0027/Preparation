@@ -1,1 +1,952 @@
+Evaluation of PostFix Expression
+=========================
+->declare a stack 
+->declare two variables which stores two operands
+->while traversing the string store every operand in the stack or push the operands into the stack, until it reaches to the operator
+->if an operator comes in between then simply pop out the first two operand from the stack and implement the function according to the operator
+->do this process until the traversal comes to an end
+Operators-‘+’, ’-‘, ’/‘, ’*’, ’^’
+Operands-‘1’, ‘2’ etc
 
+    int evaluatePostfix(string s)
+    {
+        // Your code here
+        stack<int> st;
+        for(int i=0;i<s.length();i++){
+            if(s[i]>='0' && s[i]<='9'){
+                st.push(s[i]-'0');
+            }
+            else{
+                int op2=st.top();
+                st.pop();
+                int op1=st.top();
+                st.pop();
+                
+                switch(s[i]){
+                    case '+':
+                        st.push(op1+op2);
+                        break;
+                    case '-':
+                        st.push(op1-op2);
+                        break;
+                    case '*':
+                        st.push(op1*op2);
+                        break;
+                    case '/':
+                        st.push(op1/op2);
+                        break;
+                    case '^':
+                        st.push(pow(op1,op2));
+                        break;    
+                }
+            }
+        }
+        return st.top();
+    }
+
+
+Implement Stack using Queues 
+=======================
+
+->the problem states that we need to perform functions of stack through the help of queues with out using stack
+->This approach is based on two queues
+Time Complexity-O(n)
+
+class MyStack {
+public:
+    queue<int>q1,q2;
+
+    MyStack() {
+        
+    }
+    
+    void push(int x) {
+        //q1->q1
+        while(!q1.empty()){
+            q2.push(q1.front());
+            q1.pop();
+        }
+        //q1.push(x);
+        q1.push(x);
+        //q2->q1
+        while(!q2.empty()){
+            q1.push(q2.front());
+            q2.pop();
+        }
+    }
+    
+    int pop() {
+        int val=q1.front();
+        q1.pop();
+        return val;    
+    }
+    
+    int top() {
+        return q1.front();
+    }
+    
+    bool empty() {
+        return q1.empty();
+    }
+};
+
+
+Reversing queue
+=============
+
+Approach 1:
+->Itrerative method
+->In this method it uses stack 
+->removing every element from queue and inserting it into the stack 
+->Popping out the top element after all the elements from the queue are stored in stack
+->Printing the elements while popping out 
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+Approach 2:
+->Recursive approach
+->step 1- removing first or front element from the queue 
+->step 2 - reversing the rest queue
+->step 3 - pushing back the removing element into the queue
+->these steps will be followed in the recursion function
+Time Complexity-O(n)
+Space Complexity-O(1)
+
+void  reverse(queue<int> q)
+{
+	if(q.empty())
+		return;
+	int ele = q.front();
+	q.pop();
+	reverse(q);
+	q.push(ele);
+}
+
+
+Reverse first K elements of queue
+=========================
+->take a stack
+->pop elements from the given queue and push them into the  stack
+->now again pop the top elements from the stack and push them into the queue
+->now we need to insert the remaining elements at the back from removing from the start of the queue
+->to do it silmply pop out the front element from the queue and insert the poped elements from the rear end of the queue
+Time Complexity-O(n)
+Space Complexity-O(k)
+
+queue<int> modifyQueue(queue<int> q, int k) {
+    // add code here.
+    stack<int> s;
+    for(int i=1;i<=k;i++){
+        s.push(q.front());
+        q.pop();
+    }
+    while(!s.empty()){
+        q.push(s.top());
+        s.pop();
+    }
+    int n = q.size();
+    for(int i=1;i<=n-k;i++){
+        int x = q.front();
+        q.pop();
+        q.push(x);
+    }
+    return q;
+}
+
+Convert Infix expression to Postfix expression
+==================================
+
+Algorithm:
+If operand
+	print
+If ”(”
+	push to stack
+If “)”
+	pop from stack and print until “(“ is found
+If operator
+	pop from stack and print until an operator with less precedence is found
+
+
+
+class Solution {
+  public:
+    // Function to convert an infix expression to a postfix expression.
+    int prec(char c){
+        if(c=='^'){
+            return 3;
+        }
+        else if(c=='*'||c=='/'){
+            return 2;
+        }
+        else if(c=='+'||c=='-'){
+            return 1;
+        }
+        else{
+            return -1;
+        }
+    }
+    string infixToPostfix(string s) {
+        // Your code here
+        stack<char> st;
+        string res;
+        for(int i=0;i>s.length();i++){
+            if((s[i]>='a' && s[i]<='z') || (s[i]>='A' && s[i]<='Z')){
+                res+=s[i];
+            }
+            else if(s[i]=='('){
+                st.push(s[i]);
+            }
+            else if(s[i]==')'){
+                while(!st.empty() && st.top()!='('){
+                    res+=st.top();
+                    st.pop();
+                }
+                if(!st.empty()){
+                    st.pop();
+                }
+            }
+            else{
+                while(!st.empty() && prec(st.top())>prec(s[i])){
+                    res+=st.top();
+                    st.pop();
+                }
+                st.push(s[i]);
+            }
+            while(!st.empty()){
+                res+=st.top();
+                st.pop();
+            }
+        }
+        return res;
+    }
+};
+
+
+Design and Implement Special Stack Data Structure | Added Space Optimized Version
+=================================================================
+Approach 1:Brute Force
+
+->Here take two stacks
+->insert all elements into one stack and for getting minimum element from the stack use another stack
+->Insert all elements into the stack two by taking all elements remaining in the stack one 
+->while inserting them into the stack two maintain a min variable where it defines the current minimum element in the stack
+
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+Approach 2: Better approach
+
+->Take two stacks
+->Insert all elements into one stack and store minimum elements into the another stack
+->To return minimum element from the stack we can simply return top element from the second stack
+
+Time Complexity-O(1)
+Space Complexity-O(n)
+
+
+Approach 3:Best Approach
+
+->Using of mathematics
+->Storing minimum value in a encrypted format in the stack
+->The decryption will make the value less than the current minimum value in the stack
+->Formula is 2x-m , x is current element in the stack and m is current minimum in the stack
+->While return the minimum element we need to decrypt the value , formula is 2x-(2x-m) => m , here 2x -> 2(current minimum element) , (2x-m)->V here V is current element in the stack which will be less than the current minimum element
+Time Complexity-O(1)
+Space Complexity-O(1)
+
+int mi=99999;
+void push(stack<int>& s, int a){
+	// Your code goes here
+	if(s.empty()){
+	    mi=a;
+	    s.push(a);
+	}
+	else{
+	    int x=a;
+	    if(a<mi){
+	        x=2*a-mi;
+	        mi=a;
+	    }
+	    s.push(x);
+	}
+}
+bool isFull(stack<int>& s,int n){
+	// Your code goes here
+	if(s.size()==n) return true;
+	else return false;
+}
+
+bool isEmpty(stack<int>& s){
+	// Your code goes here
+	if(s.empty()) return true;
+	else return false;
+}
+int pop(stack<int>& s){
+	// Your code goes here
+	int v=s.top();
+	if(v>=mi) s.pop();
+	else{
+	    int y=2*mi-v;
+	    s.pop();
+	    mi=y;
+	}
+}
+int getMin(stack<int>& s){
+	// Your code goes here
+	return mi;
+}
+
+
+Longest valid Parentheses
+====================
+
+Approach 1:
+->Finding all the possible combinations from the stack
+->checking for valid parentheses by using two loops from end to end
+Time Complexity-O(n^2)
+Space Complexity-O(1)
+
+Approach 2:
+->Create an empty stack and push -1 to it
+->initialize zero to result
+->If the character is ‘(‘ I.e str[I]==‘(‘, push index ‘I’ to the stack
+->else (if the character is ‘)’)
+	a)Pop an item from the stack
+	b)if the stack is not empty , then find length of the current valid substring by taking difference between current index 	and top of the stack. If current length is more than the result , then update the result
+	c)if stack is empty, push current index.
+->return result
+
+Time Complexity-O(n)
+Space Complexity-O(1)
+
+class Solution{
+public:
+    int maxLength(string s){
+        // code here
+        int n=s.length();
+        stack<int>st;
+        st.push(-1);
+        int res=0;
+        for(int i=0;i<n;i++){
+            if(s[i]=='(')
+                st.push(i);
+            else{
+                st.pop();
+                if(!st.empty())
+                    res=max(res,i-st.top());
+                else st.push(i);
+            }
+        }
+        return res;
+    }
+};’
+
+Find if an expression has duplicate parenthesis or not
+=========================================
+Time Complexity-O(n)
+Space Complexity-O(1)
+
+// C++ program to find duplicate parenthesis in a
+// balanced expression
+#include <bits/stdc++.h>
+using namespace std;
+ 
+// Function to find duplicate parenthesis in a
+// balanced expression
+
+bool findDuplicateparenthesis(string str)
+{
+    // create a stack of characters
+    stack<char> Stack;
+ 
+    // Iterate through the given expression
+    for (char ch : str)
+    {
+        // if current character is close parenthesis ')'
+        if (ch == ')')
+        {
+            // pop character from the stack
+            char top = Stack.top();
+            Stack.pop();
+ 
+            // stores the number of characters between a
+            // closing and opening parenthesis
+            // if this count is less than or equal to 1
+            // then the brackets are redundant else not
+            int elementsInside = 0;
+            while (top != '(')
+            {
+                elementsInside++;
+                top = Stack.top();
+                Stack.pop();
+            }
+            if(elementsInside < 1) {
+                return 1;
+            }
+        }
+        // push open parenthesis '(', operators and
+        // operands to stack
+        else
+            Stack.push(ch);
+    }
+    // No duplicates found
+    return false;
+}
+
+
+Stack Permutations
+===============
+
+A simple solution is to run a loop from 1 to n and for every number check if its digits are in non-decreasing order or not.
+An efficient solution is based on below observations.
+
+* Observation 1: From 1 to 9, all number have this property. So, for n <= 9, output n. 
+* Observation 2: The number whose all permutation is greater than or equal to that number have all their digits in increasing order.
+The idea is to push all the number from 1 to 9. Now, pop the top element, say topel and try to make number whose digits are in increasing order and the first digit is topel. To make such numbers, the second digit can be from topel%10 to 9. If this number is less than n, increment the count and push the number in the stack, else ignore.
+
+Time Complexity-O(x) , here x is the number of elements that are printed in the output
+Space Complexity-O(x) as it is using a stack
+
+int countNumber(int n)
+{
+    int result = 0;
+    // Pushing 1 to 9 because all number from 1
+    // to 9 have this property.
+    stack<int> s;
+    for (int i = 1; i <= 9; i++)
+    {
+        if (i <= n)
+        {
+            s.push(i);
+            result++;
+        }
+        // take a number from stack and add
+        // a digit greater than or equal to last digit
+        // of it.
+        while (!s.empty())
+        {
+            int tp = s.top();
+            s.pop();
+            for (int j = tp % 10; j <= 9; j++)
+            {
+                int x = tp * 10 + j;
+                if (x <= n)
+                {
+                    s.push(x);
+                    result++;
+                }
+            }
+        }
+    }
+    return result;
+}
+
+How to Sort a Stack using Recursion
+============================
+
+The idea of the solution is to hold all values in Function Call Stack until the stack becomes empty. When the stack becomes empty, insert all held items one by one in sorted order. and then print the stack
+
+Time Complexity-O(n^2)
+Space Complexity-O(n)
+
+void sortStack(stack<int> &s) {
+    // If the stack is empty, return
+    if (s.empty())
+        return;
+    // Remove the top element of the stack
+    int x = s.top();
+    s.pop();
+    // Sort the remaining elements in the stack using recursion
+    sortStack(s);
+    // Create two auxiliary stacks
+    stack<int> tempStack;
+    // Move all elements that are greater than x from the main stack to the tempStack
+    while (!s.empty() && s.top() > x) {
+        tempStack.push(s.top());
+        s.pop();
+    }
+    // Push x back into the main stack
+    s.push(x);
+    // Move all elements from tempStack back to the main stack
+    while (!tempStack.empty()) {
+        s.push(tempStack.top());
+        tempStack.pop();
+    }
+}
+
+First non-repeating character in a stream
+===============================
+->Here we need to use frequency array to sort the elements in the stack
+->Every time when we insert an element into the stack we need to check for the frequency array 
+->If the element’s frequency is more than one then it is repeating else we need to continue the process
+->If it is a new element then we need to insert the new element into the frequency array and keep the track of frequency 
+Time Complexity-O(n*26)
+Space Complexity-O(26)
+
+class Solution {
+	public:
+		string FirstNonRepeating(string a){
+		    // Code here
+		    vector<int>vis(26,0);
+		    string ans="";
+		    vector<char> v;
+		    int n=a.length();
+		    for(int i=0;i<n;i++){
+		        if(!vis[a[i]-'a']){
+		            v.push_back(a[i]);
+		        }
+		        vis[a[i]-'a']++;
+		        int f=0;
+		        int m=v.size();
+		        for(int j=0;j<m;j++){
+		            if(vis[v[j]-'a']==1){
+		                ans.push_back(v[j]);
+		                f=1;
+		                break;
+		            }
+		        }
+		        if(f==0)
+		            ans.push_back('#');
+		    }
+		    return ans;
+		}
+};
+
+The Celebrity Problem
+=================
+
+Approach 1: Brute Force
+->Checking celebrity row , where every element is 0 or not
+->Checking celebrity column , where every element is 1 or not except diagonal
+Time Complexity-O(n^2)
+Space Complexity-O(1)
+
+Approach 2: using stack
+->Put all celebrity column elements into the stack
+->Do this until stack size is not equal to 1
+	1)Element a = stack.top() -> s.pop()
+	2)Element b = stack.top() -> s.pop()
+->If (A knows B)
+	Discard a and Put b back
+->if (B knows A)
+	Discard b and put a back
+->At last one element will be remaining but it may be celebrity or not
+->So we need to check and verify the last element weather it is celebrity or not 
+->To verify 
+	1)Check the last element celebrity row (all 0’s or not)
+	2)every one knows celebrity (checking column’s whether they are 1 or not)
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+class Solution 
+{
+    private:
+    bool knows(vector<vector<int>>&M,int a,int b,int n){
+        if(M[a][b]==1)
+            return true;
+        else
+            return false;
+    }
+    public:
+    //Function to find if there is a celebrity in the party or not.
+    int celebrity(vector<vector<int> >& M, int n) 
+    {
+        // code here 
+        stack<int> s;
+        //step1: push all elements in stack
+        for(int i=0;i<n;i++){
+            s.push(i);
+        }
+        //step2: get 2 elements and compare them
+        while(s.size() > 1){
+            int a=s.top();
+            s.pop();
+            int b=s.top();
+            s.pop();
+            if(knows(M,a,b,n)){
+                s.push(b);
+            }
+            else{
+                s.push(a);
+            }
+        }
+        int ans=s.top();
+        //step3: single element in stack is potential celeb
+        //so verify it
+        int zeroCount=0;
+        for(int i=0;i<n;i++){
+            if(M[ans][i]==0)
+                zeroCount++;
+        }
+        //all zeroes
+        if(zeroCount != n)
+            return -1;
+            
+        //column check
+        int oneCount = 0;
+        for(int i=0;i<n;i++){
+            if(M[i][ans]==1)
+                oneCount++;
+        }
+        if(oneCount != n-1)
+            return -1;
+            
+        return ans;
+    }
+};
+
+Next Greater Element
+================
+Approach 1: Brute Force
+->Using two loops 
+->One loop for current index and another loop for checking next greater element after the current index.
+Time Complexity-O(n^2)
+Space Complexity-O(1)
+
+Approach 2:
+->Take a stack
+->traverse the array from right to left 
+->while traversing if the stack is empty then just push the current element into the stack
+->if not then check weather the current element is less than current element or not , if it is then simply pop out the elements from the stack until we get next greater element from the stack
+->if it is greater element then simply push it to answer and push the current element into the stack 
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+———> Little change of question , if we need to print the next greater element in an array if there is condition of checking the array in a circular order 
+Approach:
+->here we use an imaginary array of same elements of the array that will be attached to the array
+->using same approach in the previous method we can simply get the output 
+->But here we use the loop until 2n-1 and where ever I will be there we will keep I%n , inorder to check the array in circular order
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+class Solution {
+  public:
+    vector < int > nextGreaterElements(vector < int > & nums) {
+      int n = nums.size();
+      vector < int > nge(n, -1);
+      stack < int > st;
+      for (int i = 2 * n - 1; i >= 0; i--) {
+        while (!st.empty() && st.top() <= nums[i % n]) {
+          st.pop();
+        }
+
+        if (i < n) {
+          if (!st.empty()) nge[i] = st.top();
+        }
+        st.push(nums[i % n]);
+      }
+      return nge;
+    }
+};
+
+Distance of nearest cell having 1
+=========================
+->Using of BFS on the matrix.
+->Here we use twp additional matrices of same size of n*m and a queue data structure
+->one matrix is visited matrix and another one is distance matrix 
+->so firstly we check where the one’s are present in the given matrix and mark them as zero in the distance matrix, and mark them one in visited matrix, we send the pair of I and j locations of particular cell and with distance into the queue.
+->we store the direction values into two single dimentional arrays , we use them to navigate up,down,right and left
+->we take the locations and distance from the queue and pop the front element from the queue, with these location we navigate one step ahead in every direction if it is not visited and increase the distance by one on next visiting cell in the distance matrix.
+Time Complexity-O(n*m)
+Space Complexity-O(n*m)
+
+
+class Solution 
+{
+    public:
+    //Function to find the distance of nearest 1 in the grid for each cell.
+	vector<vector<int>>nearest(vector<vector<int>>grid)
+	{
+	    int n = grid.size(); 
+	    int m = grid[0].size(); 
+	    // visited and distance matrix
+	    vector<vector<int>> vis(n, vector<int>(m, 0)); 
+	    vector<vector<int>> dist(n, vector<int>(m, 0)); 
+	    // <coordinates, steps>
+	    queue<pair<pair<int,int>, int>> q; 
+	    // traverse the matrix
+	    for(int i = 0;i<n;i++) {
+	        for(int j = 0;j<m;j++) {
+	            // start BFS if cell contains 1
+	            if(grid[i][j] == 1) {
+	                q.push({{i,j}, 0}); 
+	                vis[i][j] = 1; 
+	            }
+	            else {
+	                // mark unvisited 
+	                vis[i][j] = 0; 
+	            }
+	        }
+	    }
+	    
+	    int delrow[] = {-1, 0, +1, 0}; 
+	    int delcol[] = {0, +1, 0, -1}; 
+	    
+	    // traverse till queue becomes empty
+	    while(!q.empty()) {
+	        int row = q.front().first.first; 
+	        int col = q.front().first.second; 
+	        int steps = q.front().second; 
+	        q.pop(); 
+	        dist[row][col] = steps; 
+	        // for all 4 neighbours
+	        for(int i = 0;i<4;i++) {
+	            int nrow = row + delrow[i]; 
+	            int ncol = col + delcol[i]; 
+	            // check for valid unvisited cell
+	            if(nrow >= 0 && nrow < n && ncol >= 0 && ncol < m 
+	            && vis[nrow][ncol] == 0) {
+	                vis[nrow][ncol] = 1; 
+	                q.push({{nrow, ncol}, steps+1});  
+	            }
+	        }
+	    }
+	    // return distance matrix
+	    return dist; 
+	}
+};
+
+Rotten Oranges
+============
+->the solution is same as before question
+->here in queue we store the location of the rotten oranges and with the time taken to rotten
+->and a visited matrix 
+->but here we won’t use distance matrix , it can be solved by visited matrix itself
+Time Complexity-O(n *m)
+Space Complexity-O(n*m)
+
+class Solution {
+  public:
+    //Function to find minimum time required to rot all oranges. 
+    int orangesRotting(vector < vector < int >> & grid) {
+      // figure out the grid size
+      int n = grid.size();
+      int m = grid[0].size();
+
+      // store {{row, column}, time}
+      queue < pair < pair < int, int > , int >> q;
+      int vis[n][m];
+      int cntFresh = 0;
+      for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+          // if cell contains rotten orange
+          if (grid[i][j] == 2) {
+            q.push({{i, j}, 0}); 
+            // mark as visited (rotten) in visited array
+            vis[i][j] = 2;
+          }
+          // if not rotten
+          else {
+            vis[i][j] = 0;
+          }
+          // count fresh oranges
+          if (grid[i][j] == 1) cntFresh++;
+        }
+      }
+
+      int tm = 0;
+      // delta row and delta column
+      int drow[] = {-1, 0, +1, 0};
+      int dcol[] = {0, 1, 0, -1}; 
+      int cnt = 0;
+
+      // bfs traversal (until the queue becomes empty)
+      while (!q.empty()) {
+        int r = q.front().first.first;
+        int c = q.front().first.second;
+        int t = q.front().second;
+        tm = max(tm, t);
+        q.pop();
+        // exactly 4 neighbours 
+        for (int i = 0; i < 4; i++) {
+          // neighbouring row and column
+          int nrow = r + drow[i];
+          int ncol = c + dcol[i];
+          // check for valid cell and 
+          // then for unvisited fresh orange
+          if (nrow >= 0 && nrow < n && ncol >= 0 && ncol < m &&
+            vis[nrow][ncol] == 0 && grid[nrow][ncol] == 1) {
+            // push in queue with timer increased
+             q.push({{nrow, ncol}, t + 1}); 
+            // mark as rotten
+            vis[nrow][ncol] = 2;
+            cnt++;
+          }
+        }
+      }
+
+      // if all oranges are not rotten
+      if (cnt != cntFresh) return -1;
+
+      return tm;
+
+    }
+};
+
+Next smaller element
+================
+->it is same like next greater element problem
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+Circular Tour
+==========
+->First start with the starting point and traverse until the fuel tank reaches less than zero
+->Now make a note of shortage of petrol when the fuel tank reaches less than zero
+->now make index = I+1 and starting again , now if the fuel tank is greater than zero until the last petrol bunk then add both fuel tank value and shortage value of petrol bunk which says that we can tour in circular way or not.
+-> if the result after adding fuel tank and shortage of fuel tank is grater than or equal to zero then the start is the point where we can start the tour and can end in a circular way.
+
+Time Complexity-O(n)
+Space Complexity-O(1)
+
+
+class Solution{
+  public:
+  
+    //Function to find starting point where the truck can start to get through
+    //the complete circle without exhausting its petrol in between.
+    int tour(petrolPump p[],int n)
+    {
+        int start=0,fueltank=0,fuelshortage=0;
+        for(int i=0;i<n;++i)
+        {
+            fueltank+=p[i].petrol-p[i].distance;
+            if(fueltank<0)
+              {
+                  start=i+1;
+                  fuelshortage+=fueltank;
+                  fueltank=0;
+              }
+        }
+        
+        if(fueltank+fuelshortage>=0)
+           return start;
+           
+        return -1;   
+    }
+};
+
+How to efficiently implement k stacks in a single array?
+==========================================
+Approach 1:
+->Divide the array into k number of parts
+->Assign those parts to the different stacks
+->here the drawback is if the part of the array is totally filled then , we cannot push anymore elements into the stack apart from that part of the array which is assigned to a particular stack even though the other parts of the array are empty.
+
+Approach 2:
+->To over come above approach we need to use an array which tracks the index of top element in the different stacks, an next array which stores the next space of the array in which we can push the next element from the particular stack, and a freespot variable to define the index where we need to store for the new element fro the stack
+Algorithm:
+Array : a[n]
+Top : top[m] , here m is number of stacks we need to be used (i.e given k)
+Next : next[n]
+So inorder to push a particular element into the array we need to follow below steps
+Step 1: Find Index
+	The index will be int index = freespot;
+Step 2: Update Freespot
+	freespot = next[index];
+Step 3: Insert into array
+	array[index] = x;
+Step 4: Update Next
+	next[index] = top[m-1];
+Step 5: Update top
+	Top[m-1] = index;
+
+For example:
+push(20,1) , here 20 is the element that need to be pushed and 1 is the stack that we need to use
+ |
+ —> index = 1;
+|
+ —> freespot = next[index] = next[1]; freestpot = 2;
+|
+ —> array[1] = 20;
+|
+ —> next[1] = top[0];
+|
+ —> top[0] = 1;
+
+Time Complexity - O(1)
+Space Complexity - O(s+n)
+
+class NStack
+{
+    int *arr;
+    int *top;
+    int *next;
+    
+    int n, s;
+     
+    int freespot;
+    
+public:
+    // Initialize your data structure.
+    NStack(int N, int S)
+    {
+        n = N;
+        s = S;
+        arr = new int[s];
+        top = new int[n];
+        next = new int[s];
+        
+        //top initialise
+        for(int i=0; i<n; i++) {
+            top[i] = -1;
+        }
+        
+        //next initialise
+        for(int i=0; i<s; i++) {
+            next[i] = i+1;
+        }
+        //update last index value to -1
+        next[s-1] = -1;
+        
+        //initialise freespot
+        freespot = 0;
+        
+    }
+
+    // Pushes 'X' into the Mth stack. Returns true if it gets pushed into the stack, and false otherwise.
+    bool push(int x, int m)
+    {
+        //check for overflow
+        if(freespot == -1) {
+            return false;
+        }
+        
+        //find index
+        int index = freespot;
+        
+        //insert element into array
+        arr[index] = x;
+        
+        //update freespot
+        freespot = next[index];
+       
+        //update next;
+        next[index] = top[m-1];
+        
+        //update top
+        top[m-1] = index;
+        
+        return true;
+    }
+
+    // Pops top element from Mth Stack. Returns -1 if the stack is empty, otherwise returns the popped element.
+    int pop(int m)
+    {
+        //check underflow condition
+        if(top[m-1] == -1) {
+            return -1;
+        }
+        
+        int index= top[m-1];
+        
+        top[m-1] = next[index];
+        
+        next[index] = freespot;
+        
+        freespot = index;
+        
+        return arr[index];
+    }
+};
