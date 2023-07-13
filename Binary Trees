@@ -1,0 +1,571 @@
+
+Maximum Depth of Binary Tree
+=======================
+There are two approaches , Level order traversal and another one is Recursive traversal
+->In level order traversal we Will use O(n) space complexity , but in recursive traversal we will use auxiliary space complexity I.e O(height)
+->In both the cases we need to traverse all the nodes of the tree in order to get the height
+-> So a binary tree has two children for the parent nodes
+->So in order to find the depth of the tree then we need to find the depth of the child nodes 
+For expample:
+									Node 1
+									      |
+							        —————————
+							        |                           |
+						          Node 2.                Node 3
+->here we need to find the 1 + max length between left side chain and right side chain 
+->The same thing will be recursively called for every node win the tree I.e node 2  , node 3 and so on until the last leaf node
+Time complexity - O(n)
+Space Complexity - O(height)
+
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        if(root == NULL) return 0; 
+        
+        int lh = maxDepth(root->left); 
+        int rh = maxDepth(root->right); 
+        
+        return 1 + max(lh, rh); 
+    }
+};
+
+Reverse Level Order Traversal
+=======================
+->We use a queue to store the node data
+->printing reverse queue
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+vector<int> reverseLevelOrder(Node *root)
+{
+    // code here
+    vector<int> ans;
+    if(!root) return;
+    queue<Node*> q;
+    q.push(root);
+    while(!q.empty()){
+        Node* t = q.front();
+        ans.push_back(t->data);
+        if(t->right) q.push(t->right);
+        if(t->left) q.push(t->left);
+        q.pop();
+    }
+    reverse(ans.begin(),ans.end());
+    for(int i=0;i<ans.size();i++) cout<<ans[i]<<" ";
+}
+
+
+
+Subtree of Another Tree
+==================
+->Checking root and subroot , if they are equal then checking weather the subtree exists in the main tree or not , else we jump to the next node of the main binary tree and do the process again until we reach leaf nodes
+->We simply recursively iterate over left sub tree of the the main tree and check for root node of the Subroot tree , if matches then we check for the subtree or else we move to the next node in the main tree or to the right subtree of the main binary tree and do the process again 
+Time Complexity-O(n^2)
+Space Complexity-O(1)
+
+class Solution {
+public:
+    bool issymmetric(TreeNode* root,TreeNode* subRoot){
+        if((root==NULL && subRoot!=NULL) || (root!=NULL && subRoot==NULL)) return false;
+        if(root==NULL && subRoot==NULL) return true;
+        if(root->val!=subRoot->val) return false;
+
+        return issymmetric(root->left,subRoot->left) && issymmetric(root->right,subRoot->right);
+    }
+    bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+        if(root==NULL) return false;
+        if(root->val==subRoot->val){
+            bool ans=issymmetric(root,subRoot);
+            if(ans) return true;
+        }
+        bool left=issymmetric(root->left,subRoot);
+        bool right=issymmetric(root->right,subRoot);
+        return left || right;
+    }
+};
+
+
+Invert Binary Tree
+=============
+Approach 1:
+->Construct binary tree again and while create the binary make sure to place the values into the node in the reverse order such that it will create a reverse binary tree
+->It is not an efficient way of making reverse tree because it will complex and take more time to construct
+
+Approach 2:
+->Play with pointers
+->Swap the pointer that are linking from the root node to the sub nodes
+->swap right pointer to left and left pointer to the right.
+->Finally return the root pointer
+Time Complexity-O(n)
+
+
+class Solution {
+public:
+void swap(TreeNode* curr){
+    if(!curr)
+        return;
+    swap(curr->left);
+    swap(curr->right);
+
+    TreeNode* temp;
+    temp=curr->left;
+    curr->left = curr->right;
+    curr->right = temp;
+}
+    TreeNode* invertTree(TreeNode* root) {
+        swap(root);
+        return root;
+    }
+};
+
+
+Binary Tree Level Order Traversal
+=========================
+->take a queue data structure 
+->send the root element into the queue and check if the root has right or left sub Childs , if it has then push those into the queue 
+->Now pick those elements and send them to the vector of vectors which is the answer and remove those from the queue and move forward in the tree
+
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>>ans;
+        if(root==NULL) return ans;
+        queue<TreeNode*>q;
+        q.push(root);
+        while(!q.empty()){
+            int size = q.size();
+            vector<int> level;
+            for(int i=0;i<size;i++){
+                TreeNode *node = q.front();
+                q.pop();
+                if(node->left != NULL) q.push(node->left);
+                if(node->right != NULL) q.push(node->right);
+                level.push_back(node->val);
+            }
+            ans.push_back(level);
+        }
+        return ans;
+    }
+};
+
+Right view and left of the binary tree
+============================
+Approach 1:(iterative methods)
+->level order traversal
+->printing every last element in a particular level
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+Approach 2:(recursive methods)
+->using reverse pre order traversal 
+->this basically first traverse to the right side of the root and then left side of the root
+->here we take a data structure and while traversing through the tree if the current node is the right side of the tree then we store it into the data structure
+->We do it by checking the size of the data structure , if the data structure size is equal to the level of the current node in the right side then we simply push it to the datastructure which is our answer.
+Time Complexity-O(n)
+Space Complexity-O(height)
+->for left side view then simply reverse the statements to the left.
+
+class Solution{
+	vector<int> rightSideView(TreeNode *root){
+		vector<int> res;
+		recursion(root, 0, res);
+		return res;
+	}
+public:
+	void recursion(TreeNode *root, int level,vector<int> &res){
+		if(root==NULL) return;
+		if(res.size()==level) res,push_back(root->val);
+		recursion(root->right, level+1,res);
+		rexursion(root->left, level+1, res);
+	}
+};
+
+->we use this because the code will be simple but for the iterative method the code will be long when compared to the recursive methods
+
+ZigZag Tree Traversal
+=================
+->initially take a queue data structure
+->store root of the tree
+->take a vector of list data structure we will be storing answer
+->introduce a flag variable , which is gonna say us if ur moving from left to right or left to right
+->flag=0;
+->here if the flag =0 then it means we are moving from left to right
+->if the flag =1 then we are moving from right to left
+->First insert the sub children of the root node into queue data structure and take out the root node and insert it into the answer data structure
+->after inserting them to answer data structure now make sure we make the flag to 1 which means we need to traverse from right to left
+->now we get next level nodes and check for any sub children , if there are children we insert them into the queue data structure
+->once they are inserted we can remove those level node from the queue data structure
+->Now we need to insert that level elements into the answer data structure in reverse order since the flag is 1
+->When the queue becomes empty then we will be having the zig zag elements in the answer data structure which is our answer
+Time Complexity-O(n)
+Space Complexity-O(n)
+
+
+class Solution{
+	public:
+		vector<vector<int>> zigzaglevelorder(TreeNode * root){
+			vector<vector<int>> result;
+			if(root==NULL){
+				return result;
+			}
+			queue<TreeNode*> nodesqueue;
+			nodesqueue.push(root);
+			bool lefttoright = true;
+			while(!nodesqueue.empty()){
+				int size=nodesqueue.size();
+				vector<int> row(size);
+				for(int i=0;i<size;i++){
+					TreeNode* node = nodesqueue.front();
+					nodesqueue.pop();
+					
+					//find position to fill node's value
+					int index = (lefttoright) ? i : (size-1-i);
+					row[index]=node->val;
+					if(node->left){
+						nodesqueue.push(node->left);
+					}
+					if(node->right){
+						nodesqueue(node->right);
+					}
+					//after this level
+					lefttoright = !lefttoright;
+					result.push_back(row);
+				}
+				return result;
+			}
+			return result;
+		}
+};
+
+
+Maximum depth of the tree
+=====================
+
+->using recursion
+->Using 1+max(left height, right height) at a current node using recursion
+Time Complexity->O(n)
+Space Complexity-O(height)
+
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        if(root == NULL) return 0; 
+        
+        int lh = maxDepth(root->left); 
+        int rh = maxDepth(root->right); 
+        
+        return 1 + max(lh, rh); 
+    }
+};
+
+Diameter of a binary tree
+===================
+Approach 1:
+->use (left height + right height) at every node in the tree
+->once we found it make it max and compare every time this max with current max if it is greater then update the max to new max value
+->travers all the node and we will get the answer
+Time Complexity - O(n^2)
+
+Pseudo code:
+Find max(root){
+	if(root == NULL)
+		return;
+	lh = findleftH(node->left);
+	rh = findrightH(node->right);
+	maxi = max(maxi,lh+rh);
+	findmax(node->left);
+	findmax(node->right);
+}
+
+
+Approach 2:
+->we use finding height algorithm 
+->we use it at every node to find the height and see the maximum height
+Time Complexity-O(n)
+Space Complexity-O(1)
+
+class Solution {
+public:
+    int diameterOfBinaryTree(TreeNode* root) {
+        int diameter = 0;
+        height(root, diameter);
+        return diameter;
+    }
+
+private:
+    int height(TreeNode* node, int& diameter) {
+
+        if (!node) {
+            return 0;
+        }
+
+        int lh = height(node->left, diameter);
+        int rh = height(node->right, diameter);
+
+        diameter = max(diameter, lh + rh);
+
+        return 1 + max(lh, rh);
+    }
+};
+
+Check if the Binary Tree is Balanced Binary Tree
+=====================================
+->The tree is balanced if every node in the tree fills this condition I.e (lh + rh <=1)
+Approach 1:
+->traversing every node figuring out the left height  and right height 
+Time Complexity - O(n^2)
+
+Pseudo Code:
+Bool check(Node)
+	if node == null
+		return true
+	lh = fingHleft(node->left)
+	rh = findHright(node->right)
+	
+	if(abs(rh-lh)>1) return false
+
+	Bool left = check(node->left)
+	Bool right = check(node->right)
+
+	if(!left || !right) return false
+
+	return true
+
+Approach 2:
+->use finding height algorithm
+Time Complexity - O(n)
+Space Complexity - O(n)
+
+class Solution {
+
+public:
+    bool isBalanced(TreeNode* root) {
+        return dfsHeight (root) != -1;
+    }
+
+    int dfsHeight (TreeNode *root) {
+
+        if (root == NULL) return 0;
+        
+        int leftHeight = dfsHeight (root -> left);
+
+        if (leftHeight == -1) 
+            return -1;
+        
+        int rightHeight = dfsHeight (root -> right);
+
+        if (rightHeight == -1) 
+            return -1;
+        
+        if (abs(leftHeight - rightHeight) > 1)  
+            return -1;
+
+        return max (leftHeight, rightHeight) + 1;
+    }
+};
+
+
+LCA in a binary tree
+===============
+Lowest Common Ancestor
+Approach 1: brute force
+->Taking the two nodes for which we need to find the ancestors that are given as input
+->For input a or node a create a path from the root node
+->For input b or node b create a path from the root node 
+->Now check for matching node from the both the paths until we find an unpatching nodes , then the before matching node is the ancestor for the given input
+
+Time Complexity-O(n^4)
+
+Approach 2: recursive traversal technique (DFS traversal technique)
+->Traverse in the left side if the tree , if we find the node that we are looking then simply return that value from the node to the previous node recursively
+->traverse same in the right side recursively
+->if at a particular node both the values meet then it is the ancestor for those particular node in the tree.
+Time Complexity - O(n)
+Space Complexity - O(1)
+
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        //base case
+        if (root == NULL || root == p || root == q) {
+            return root;
+        }
+        TreeNode* left = lowestCommonAncestor(root->left, p, q);
+        TreeNode* right = lowestCommonAncestor(root->right, p, q);
+
+        //result
+        if(left == NULL) {
+            return right;
+        }
+        else if(right == NULL) {
+            return left;
+        }
+        else { //both left and right are not null, we found our result
+            return root;
+        }
+    }
+};
+
+Check if two trees are identical or not
+=============================
+->use pre order traversal
+Time Complexity - O(n)
+Space Complexity - O(n)
+
+bool isIdentical(node * node1, node * node2) {
+  if (node1 == NULL && node2 == NULL)
+    return true;
+  else if (node1 == NULL || node2 == NULL)
+    return false;
+
+  return ((node1 -> data == node2 -> data) && isIdentical(node1 -> left, node2 -> left) && isIdentical(node1 -> right, node2 -> right));
+}
+
+
+Boundary Traversal of the binary tree
+=============================
+Three steps to do this 
+1st step : traverse left excluding the leaf nodes
+2nd step : leaf nodes
+3rd step : reverse traverse right excluding the leaf nodes
+
+1st step - get all the left nodes and right nodes (note - if there doesn’t exit left node to a particular node then take right node) until we get leaf node 
+Leaf nodes - Use inorder traversal for getting the loaf nodes in left to right format (i.e ignorer works root, left, right)
+3rd step - take a stack , push all the right nodes from the root and store them in the stack until the traversal reaches the leaf nodes . Once it is done now take the top elements from the stack and store them in the answer which will be in the reverse order 
+
+Time Complexity - O(n)
+Space Complexity - O(n)
+
+ bool isLeaf(node * root) {
+  return !root -> left && !root -> right;
+}
+
+void addLeftBoundary(node * root, vector < int > & res) {
+  node * cur = root -> left;
+  while (cur) {
+    if (!isLeaf(cur)) res.push_back(cur -> data);
+    if (cur -> left) cur = cur -> left;
+    else cur = cur -> right;
+  }
+}
+void addRightBoundary(node * root, vector < int > & res) {
+  node * cur = root -> right;
+  vector < int > tmp;
+  while (cur) {
+    if (!isLeaf(cur)) tmp.push_back(cur -> data);
+    if (cur -> right) cur = cur -> right;
+    else cur = cur -> left;
+  }
+  for (int i = tmp.size() - 1; i >= 0; --i) {
+    res.push_back(tmp[i]);
+  }
+}
+
+void addLeaves(node * root, vector < int > & res) {
+  if (isLeaf(root)) {
+    res.push_back(root -> data);
+    return;
+  }
+  if (root -> left) addLeaves(root -> left, res);
+  if (root -> right) addLeaves(root -> right, res);
+}
+
+vector < int > printBoundary(node * root) {
+  vector < int > res;
+  if (!root) return res;
+
+  if (!isLeaf(root)) res.push_back(root -> data);
+
+  addLeftBoundary(root, res);
+
+  // add leaf nodes
+  addLeaves(root, res);
+
+  addRightBoundary(root, res);
+  return res;
+}
+
+Maximum Path sum
+===============
+Approach 1: Brute Force
+->Trying every two nodes and there path
+->Updating maximum sum at every time if the current maximum sum is greater than the previous sum
+Time Complexity - O(n^2)
+
+Approach 2: using maximum height of the binary tree and maximum. maximum Width of the binary tree
+->Finding maximum in the left of the node and right of the node , now adding the node value and left , right maximum 
+->if the current maximum is grater than the original maximum value then simply update the original maximum with the current maximum value
+->do this recursively untill the recursion reaches the starting node with maximum value.
+Time Complexity - O(n)
+Space Complexity - O(n)
+
+int findMaxPathSum(node * root, int & maxi) {
+  if (root == NULL) return 0;
+
+  int leftMaxPath = max(0, findMaxPathSum(root -> left, maxi));
+  int rightMaxPath = max(0, findMaxPathSum(root -> right, maxi));
+  int val = root -> data;
+  maxi = max(maxi, (leftMaxPath + rightMaxPath) + val);
+  return max(leftMaxPath, rightMaxPath) + val;
+
+}
+
+int maxPathSum(node * root) {
+  int maxi = INT_MIN;
+  findMaxPathSum(root, maxi);
+  return maxi;
+
+}
+
+Symmetric binary tree or not
+======================
+->First check the root node are they equal or not 
+->secondly check the root next node value , are they equal or not 
+->if they are equal then we simultaneously move left in the left subtree of the main tree and move right in the right subtree of the main tree from the current nodes.
+->check the right and left values at the nodes , if they match move forward until it reaches null else simply return false
+Time Complexity - O(n)
+Space Complexity - O(n)
+
+bool isSymmetricUtil(node * root1, node * root2) {
+  if (root1 == NULL || root2 == NULL)
+    return root1 == root2;
+  return (root1 -> data == root2 -> data) && isSymmetricUtil(root1 -> left, root2->
+  right) && isSymmetricUtil(root1 -> right, root2 -> left);
+}
+bool isSymmetric(node * root) {
+  if (!root) return true;
+  return isSymmetricUtil(root -> left, root -> right);
+}
+
+
+Flatten Binary Tree to Linked List
+=========================
+
+
+class Solution {
+  node * prev = NULL;
+  public:
+   void flatten(node* root) {
+        node* cur = root;
+		while (cur)
+		{
+			if(cur->left)
+			{
+				node* pre = cur->left;
+				while(pre->right)
+				{
+					pre = pre->right;
+				}
+				pre->right = cur->right;
+				cur->right = cur->left;
+				cur->left = NULL;
+			}
+			cur = cur->right;
+		}
+    }
+
+};
+
