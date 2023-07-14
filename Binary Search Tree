@@ -1,0 +1,113 @@
+Populating Next Right Pointers in Each Node
+==================================
+->Simply connect every left node to the right node in the binary tree
+
+class Solution {
+public:
+    Node* connect(Node* root) {
+        if(root==NULL)
+            return NULL;
+        Node* current=root;
+        while(current->left!=NULL){
+            Node* temp=current;
+            while(current!=NULL){
+                current->left->next=current->right;
+                current->right->next=current->next==NULL?NULL: current->next->left;
+                current=current->next;
+            }
+            current=temp->left;
+        }
+        return root;
+    }
+};
+
+Search in a Binary Search Tree
+========================
+Use the property of binary search tree
+Time Complexity - O(log2^n)
+->which is the height
+
+class Solution {
+public:
+    TreeNode* searchBST(TreeNode* root, int val) {
+        while(root != NULL && root->val != val){
+            root = val<root->val? root->left:root->right;
+        }
+        return root;
+    }
+};
+
+Convert Sorted Array to Binary Search Tree
+=================================
+->simply using binary search concept and implementing it in the binary search tree 
+
+class Solution {
+public:
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        if(nums.size()==0) return NULL;
+        return bst(nums,0,nums.size()-1);
+    }
+    TreeNode* bst(vector<int>nums,int left,int right){
+        if(left>right)return NULL;
+        int midpoint = left+ (right-left)/2;
+        TreeNode* node = new TreeNode(nums[midpoint]);
+        node->left= bst(nums,left,midpoint-1);
+        node->right=bst(nums,midpoint+1,right);
+        return node;
+    }
+};
+
+
+Construct Binary Search Tree from Preorder Traversal
+=========================================
+Approach 1: brute force
+->Simply build the binary search tree from the starting element in the array
+Time Complexity - O(n^2)
+
+Approach 2: Use preorder and inorder
+->Given pre order and now create an inorder 
+->using preorder and inorder we can simply create an unique binary search tree
+Time Complexity - O(nlogn) + O(n)
+Space Complexity - O(n)
+
+Approach 3: 
+->Now simply use the binary search tree property to construct the binary tree
+->before doing so simply make a note of upper bound at every node which we are currently inserting the node into the binary search tree.
+->If the value is less than the upper bound the node will move to the left of the current node , if not the value will be moving to the right of the current node 
+Time Complexity - O(n)
+Space Complexity - O(1)
+
+
+class Solution {
+public:
+    TreeNode* bstFromPreorder(vector<int>& A) {
+        int i=0;
+        return build(A, i, INT_MAX);
+    }
+    TreeNode* build(vector<int>& A, int& i,int bound){
+        if(i==A.size() || A[i]>bound) return NULL;
+        TreeNode* root = new TreeNode(A[i++]);
+        root->left = build(A,i,root->val);
+        root->right=build(A,i,bound);
+        return root;
+    }
+};
+
+
+Given Binary tree is valid BST or not
+============================
+->At every node note the upper and lower value which is the range of the value that should be in between
+Time Complexity - O(n)
+Space Complexity - O(1)
+
+class Solution {
+    public boolean isValidBST(TreeNode root) {
+        return isValidBST(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+    public boolean isValidBST(TreeNode root, long minVal, long maxVal){
+        if(root == null) return true;
+        if(root.val>=maxVal || root.val<=minVal) return false;
+        return isValidBST(root.left,minVal,root.val) && isValidBST(root.right,root.val,maxVal);
+    }
+}
+
