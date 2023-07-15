@@ -111,3 +111,227 @@ class Solution {
     }
 }
 
+
+Find LCA of two nodes in BST
+=======================
+->least common ancestor of two nodes in the binary search tree
+->Simply traverse from root node
+->if the both elements are less than the search in the left child 
+->if the both elements are greater than then search In the right child
+->At a point one of the elements will be less than the current node value and other element will be greater than current nodes value which will be its ancestor
+->if the node itself is a element then that element itself is the ancestor
+Time Complexity - O(height)
+Space Complexity - O(1)
+
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if(root == NULL) return NULL;
+        int curr = root->val;
+        if(curr<p->val && curr<q->val){
+            return lowestCommonAncestor(root->right,p,q);
+        }
+        if(curr>p->val && curr>q->val){
+            return lowestCommonAncestor(root->left,p,q);
+        }
+        return root;
+    }
+};
+
+
+Inorder successor in BST
+===================
+Approach 1: Brute Force
+->store the inorder traversal values
+->Check what comes after the given value which will be the answer
+Time Complexity - O(n)+logn
+Space Complexity - O(n)
+
+Approach 2: 
+->Perform an inorder traversal 
+->the value which comes after the given input value it is the answer and stop the traversal right over there
+Time Complexity - O(n)
+Space Complexity - O(1)
+
+Approach 3:
+->Take a variable named successor
+->If the value is less than the successor then move into the left part
+->else move to the right part of the current node 
+->Do this until we find just a bit next element of the given input
+Time Complexity - O(height)
+Space Complexity - O(1)
+
+
+class Solution{
+	public:
+		TreeNode* inorderSuccessor(TreeNode* root, TreeNode* p){
+			TreeNode* successor = NULL;
+			while(root != NULL){
+				if(p->val >= root->val){
+					root = root->right;
+				}else{
+					successor=root;
+					root=root->left;
+				}
+			}
+			return successor;
+		}
+}
+
+
+Floor in a BST
+===========
+->same like above problem but here we need to find floor of the value that is just a bit less than the given value in the binary search tree
+Time Complexity - O(height)
+Space Complexity - O(1)
+
+
+int floorInBST(TreeNode<int> * root, int key)
+{
+    // Write your code here.
+    int floor = -1;
+    while(root){
+        if(root->val == key){
+            floor = root->val;
+            return floor;
+        }
+        if(key>root->val){
+            floor=root->val;
+            root=root->right;
+        }
+        else{
+            root=root->left;
+        }
+    }
+    return floor;
+}
+
+
+Kth Smallest Element in a BST
+=======================
+Approach 1:
+->do any of the traversal methods in the binary search tree
+->store the traversal into a vector 
+->sort the vector 
+-> the 4th element will be the smallest element in the binary search tree
+Time Complexity - O(n)+O(nlogn)
+Space Complexity - O(n)
+
+Approach 2:
+->Take inorder traversal which will traverse in such a way that it will move in ascending order 
+->store the nodes and print out the 4th element from the stored vector
+Time Complexity - O(n)
+Space Complexity - O(n)
+
+Approach 3:
+->use inorder traversal
+->but while travelling make a count variable 
+->if the count reaches kth value then it will be the answer
+Time Complexity - O(n)
+Space Complexity - O(1)
+
+
+node* kthlargest(node* root,int& k)//largest
+{
+	if(root==NULL)
+	return NULL;
+	
+	node* right=kthlargest(root->right,k);
+	if(right!=NULL)
+	return right;
+	k--;
+	
+	if(k==0)
+	return root;
+	
+	return kthlargest(root->left,k);
+}
+
+node* kthsmallest(node* root,int &k)//smallest
+{
+	if(root==NULL)
+	return NULL;
+	
+	node* left=kthsmallest(root->left,k);
+	if(left!=NULL)
+	return left;
+	k--;
+	if(k==0)
+	return root;
+	
+	return kthsmallest(root->right,k);
+}
+
+
+Find a pair with a given sum in BST
+===========================
+Approach 1:
+->do inorder traversal and store the traversal in a vector
+->now the question becomes into two sum problem 
+->use two pointer technique and get the answer
+Time Complexity - O(n) + O(n)
+Space Complexity - O(n)
+
+Approach 2:
+->using BST iterator
+->push all the lefts into one stack
+->push all the rights into on stack
+->while traversing pop one element from one stack and pop another element from another stack 
+->if the sum is equal to the given element then it is the answer
+Time Complexity - O(n)
+Space Complexity - O(height) * 2
+
+class BSTIterator {
+    stack<TreeNode *> myStack;
+    bool reverse = true; 
+public:
+    BSTIterator(TreeNode *root, bool isReverse) {
+        reverse = isReverse; 
+        pushAll(root);
+    }
+
+    /** @return whether we have a next smallest number */
+    bool hasNext() {
+        return !myStack.empty();
+    }
+
+    /** @return the next smallest number */
+    int next() {
+        TreeNode *tmpNode = myStack.top();
+        myStack.pop();
+        if(!reverse) pushAll(tmpNode->right);
+        else pushAll(tmpNode->left);
+        return tmpNode->val;
+    }
+
+private:
+    void pushAll(TreeNode *node) {
+        for(;node != NULL; ) {
+             myStack.push(node);
+             if(reverse == true) {
+                 node = node->right; 
+             } else {
+                 node = node->left; 
+             }
+        }
+    }
+};
+class Solution {
+public:
+    bool findTarget(TreeNode* root, int k) {
+        if(!root) return false; 
+        BSTIterator l(root, false); 
+        BSTIterator r(root, true); 
+        
+        int i = l.next(); 
+        int j = r.next(); 
+        while(i<j) {
+            if(i + j == k) return true; 
+            else if(i + j < k) i = l.next(); 
+            else j = r.next(); 
+        }
+        return false; 
+    }
+};
+
+
